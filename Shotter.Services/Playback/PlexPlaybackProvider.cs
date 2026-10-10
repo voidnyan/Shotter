@@ -183,7 +183,8 @@ public class PlexPlaybackProvider(
 
     private sealed class PlexPlayer
     {
-        public string? UserID { get; set; }
+        // Plex emits userID as a JSON number; System.Text.Json will not coerce Number to string.
+        public JsonElement UserID { get; set; }
         public string? State { get; set; }
         public string? Product { get; set; }
         public string? Title { get; set; }
