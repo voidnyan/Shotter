@@ -13,23 +13,38 @@ public class FileNameResolver : IFileNameResolver
     {
         var videoTimeStamp = GetVideoTimestamp(mediaInfo.PositionSeconds);
         
-        // TODO: filenames should escape all filesystem unfriendly characters.
         if (mediaInfo.IsMovie)
         {
-            var movieNamePath = mediaInfo.Name!.Replace(" ", "_");
+            var movieNamePath = SanitizePathComponent(mediaInfo.Name!.Replace(" ", "_"));
             var movieDirectory = Path.Combine(ScreenshotDirectory, MoviesDirectory, movieNamePath);
             Directory.CreateDirectory(movieDirectory);
-            return (movieDirectory, $"{movieNamePath}_{videoTimeStamp}");
+            return (movieDirectory, 
+                $"{SanitizePathComponent(movieNamePath)}_{videoTimeStamp}");
         }
-        var seriesNamePath = mediaInfo.SeriesName!.Replace(" ", "_");
+        var seriesNamePath = SanitizePathComponent(mediaInfo.SeriesName!.Replace(" ", "_"));
         var seriesDirectory = Path.Combine(ScreenshotDirectory, ShowsDirectory, seriesNamePath);
         
         Directory.CreateDirectory(seriesDirectory);
 
         return (seriesDirectory,
-            $"{seriesNamePath}_S{mediaInfo.ParentIndexNumber:D2}E{mediaInfo.IndexNumber:D2}_{videoTimeStamp}");
+            $"{SanitizePathComponent(seriesNamePath)}_S{mediaInfo.ParentIndexNumber:D2}E{mediaInfo.IndexNumber:D2}_{videoTimeStamp}");
     }
 
+    private static string SanitizePathComponent(string path)
+    {
+        path = path.Replace(" ", "_");
+        
+        var invalidChars = Path.GetInvalidFileNameChars()
+            .Concat("<>:\"/\\|?*".ToCharArray())
+            .Distinct()
+            .ToHashSet();
+
+        return new string(path
+                .Where(c => !invalidChars.Contains(c))
+                .ToArray())
+            .Trim()
+            .TrimEnd('.');
+    }
 
     private static string GetVideoTimestamp(double positionSeconds)
     {
