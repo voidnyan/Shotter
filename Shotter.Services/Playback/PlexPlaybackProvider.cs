@@ -53,7 +53,7 @@ public class PlexPlaybackProvider(
         {
             filePath = await ResolveFilePathFromMetadataAsync(
                 session.RatingKey,
-                part?.Id,
+                part?.Id ?? default,
                 cancellationToken);
         }
 
@@ -91,7 +91,7 @@ public class PlexPlaybackProvider(
 
     private async Task<string?> ResolveFilePathFromMetadataAsync(
         string? ratingKey,
-        long? sessionPartId,
+        JsonElement sessionPartId,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(ratingKey))
@@ -124,9 +124,11 @@ public class PlexPlaybackProvider(
             return null;
         }
 
-        if (sessionPartId is not null)
+        var sessionPartIdText = FormatPlexId(sessionPartId);
+        if (sessionPartIdText != null)
         {
-            var matched = parts.FirstOrDefault(p => p.Id == sessionPartId && !string.IsNullOrEmpty(p.File));
+            var matched = parts.FirstOrDefault(p =>
+                FormatPlexId(p.Id) == sessionPartIdText && !string.IsNullOrEmpty(p.File));
             if (matched?.File != null)
             {
                 return matched.File;
@@ -135,6 +137,15 @@ public class PlexPlaybackProvider(
 
         return parts.FirstOrDefault(p => !string.IsNullOrEmpty(p.File))?.File;
     }
+
+    // Plex emits ids as JSON numbers or strings depending on endpoint/client.
+    private static string? FormatPlexId(JsonElement id) =>
+        id.ValueKind switch
+        {
+            JsonValueKind.Number => id.GetRawText(),
+            JsonValueKind.String => id.GetString(),
+            _ => null
+        };
 
     private async Task<T?> GetPlexJsonAsync<T>(
         string path,
@@ -268,7 +279,8 @@ public class PlexPlaybackProvider(
 
     private sealed class PlexPart
     {
-        public long? Id { get; set; }
+        // Plex may emit Part.id as a JSON number or string.
+        public JsonElement Id { get; set; }
 
         public string? File { get; set; }
 
