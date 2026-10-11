@@ -145,12 +145,15 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
 
         var filter =
             $"[0:v:0][0:s:{subtitlesIndex}]overlay[overlaid];" +
-            $"[overlaid]select='gte(t\\,{positionSeconds.ToString(CultureInfo.InvariantCulture)})'[out]";
-        var resolutionFilter = await GetResolutionFilter(request, mediaPath);
+            $"[overlaid]select='gte(t\\,{positionSeconds.ToString(CultureInfo.InvariantCulture)})'[selected]";
 
-        if (!string.IsNullOrEmpty(resolutionFilter)) 
-            filter += resolutionFilter;
-            
+        var resolutionFilter = await GetComplexResolutionFilter(request, mediaPath);
+
+        if (!string.IsNullOrEmpty(resolutionFilter))
+            filter += $";[selected]{resolutionFilter}[out]";
+        else
+            filter += ";[selected]null[out]";
+        
         startInfo.ArgumentList.Add("-filter_complex");
         startInfo.ArgumentList.Add(filter);
 
@@ -210,13 +213,26 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
 
     private async Task<string> GetResolutionFilter(CaptureRequest request, string mediaPath)
     {
+        var height = await GetResolutionHeight(request, mediaPath);
+        return height.HasValue ? $"scale=-2:{height}:flags=lanczos" : string.Empty;
+    }
+
+    private async Task<string> GetComplexResolutionFilter(CaptureRequest request, string mediaPath)
+    {
+        var height = await GetResolutionHeight(request, mediaPath);
+        return height.HasValue ? $"scale=-2:{height}" : string.Empty;
+    }
+
+    private async Task<int?> GetResolutionHeight(CaptureRequest request, string mediaPath)
+    {
         var height = request.Height ?? _options.ScreenshotHeight;
-        if (!height.HasValue) return string.Empty;
+
+        if (!height.HasValue) return null;
 
         var sourceHeight = await GetVideoHeightAsync(mediaPath);
         height = Math.Min(sourceHeight, height.Value);
-        
-        return $"scale=-2:{height}:flags=lanczos";
+
+        return height == sourceHeight ? null : height;
     }
     
     private static async Task<int> GetVideoHeightAsync(
@@ -270,7 +286,7 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
 
     private void SetQuality(ProcessStartInfo startInfo, CaptureRequest request)
     {
-        switch (request.Format ?? _options.ScreenshotFileExtension.ToLowerInvariant())
+        switch (request.Format?.ToLowerInvariant() ?? _options.ScreenshotFileExtension.ToLowerInvariant())
         {
             case "jpg":
             case "jpeg":
