@@ -3,7 +3,7 @@ namespace Shotter.Core.Models;
 public sealed record CaptureJob(
     string MediaPath,
     double PositionSeconds,
-    bool IncludeSubtitles,
+    CaptureRequest CaptureRequest,
     int? SubtitleIndex,
     string? SubtitlesCodec,
     string? ExternalSubtitlePath,

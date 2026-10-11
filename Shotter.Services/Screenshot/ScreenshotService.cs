@@ -12,7 +12,7 @@ public partial class ScreenshotService(
     IFileNameResolver fileNameResolver) : IScreenshotService
 {
     public async Task HandleScreenshotRequest(
-        bool includeSubtitles,
+        CaptureRequest request,
         CancellationToken cancellationToken)
     {
         var mediaInfo= await playbackProvider.GetPlaybackInformation(cancellationToken);
@@ -21,14 +21,14 @@ public partial class ScreenshotService(
         var job = new CaptureJob(
             mediaInfo.MediaPath,
             mediaInfo.PositionSeconds,
-            includeSubtitles,
+                request,
             mediaInfo.SubtitlesIndex,
             mediaInfo.SubtitlesCodec,
             mediaInfo.ExternalSubtitlePath,
             Path.Combine(output.outputDirectory, output.outputFile),
             output.outputDirectory);
         
-        LogQueryingJob(job.MediaPath, job.PositionSeconds, job.IncludeSubtitles);
+        LogQueryingJob(job.MediaPath, job.PositionSeconds, request.IncludeSubtitles);
         
         if (captureQueue.TryEnqueue(job))
         {

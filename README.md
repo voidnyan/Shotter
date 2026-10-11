@@ -25,7 +25,10 @@ services:
       Ntfy__Topic: # The ntfy topic the notification will be sent
       Ntfy__AccessToken: # Optional, needed if the topic is protected
       Ffmpeg__ScreenshotFileExtension: # Optional, defaults to jpg
-      Ffmpeg__ScreenshotQuality: #Optional, the value range depends on your file extension
+      Ffmpeg__JpgQuality: # Optional, default 2
+      Ffmpeg__PngQuality: # Optional, default 6
+      Ffmpeg__WebpQuality: # Optional, default 90
+      Ffmpeg__ScreenshotHeight: # Optional, removing this defaults to source resolution
     volumes:
       - ./screenshots:/screenshots
       - /path/to/media:/media:ro
@@ -40,8 +43,13 @@ The media volumes should match what you have for your media server.
 Calling `http://<yourshotteraddress>/api/screenshot` will queue taking a screenshot. 
 It is recommended to pause the stream before the call.
 
-Calling `/api/screenshot?includeSubtitles=true` queues a screenshot job that will include subtitles.
-This process is heavier on the system resources.
+You can include the following query parameters in the above call. All of the parameters are optional.
+
+| Parameter         | Type   | Description                           |
+| ----------------- | ----   | ------------------------------------- |
+| includeSubtitles  | bool   | Include or exclude subtitles          |
+| format            | string | The file format (png, jpg or webp)    |
+| height            | int    | Height of the screenshot.             |
 
 You can also call `/api/is-processing`, which will return `true`, if the server is currently processing a screenshot job
 and `false` if not.

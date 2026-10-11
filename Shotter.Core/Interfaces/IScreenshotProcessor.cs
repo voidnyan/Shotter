@@ -1,3 +1,5 @@
+using Shotter.Core.Models;
+
 namespace Shotter.Core.Interfaces;
 
 public interface IScreenshotProcessor
@@ -5,7 +7,7 @@ public interface IScreenshotProcessor
     Task TakeScreenshot(CancellationToken cancellationToken, double positionSeconds,
         string mediaPath,
         string outputPath,
-        bool includeSubtitles,
+        CaptureRequest request,
         int? subtitlesIndex,
         string? subtitlesCodec,
         string? externalSubtitlePath);

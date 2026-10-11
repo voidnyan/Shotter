@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Shotter.Core.Interfaces;
+using Shotter.Core.Models;
 using Shotter.Services.Notifications;
 
 namespace Shotter.Api.Controllers;
@@ -13,10 +14,10 @@ public class ShotterController(
     : ControllerBase
 {
     [HttpGet("screenshot")]
-    public async Task<IActionResult> ScreenshotCurrentStream([FromQuery] bool includeSubtitles,
+    public async Task<IActionResult> ScreenshotCurrentStream([FromQuery] CaptureRequest request,
         CancellationToken cancellationToken)
     {
-        await screenshotService.HandleScreenshotRequest(includeSubtitles, cancellationToken);
+        await screenshotService.HandleScreenshotRequest(request, cancellationToken);
         return Accepted();
     }
 

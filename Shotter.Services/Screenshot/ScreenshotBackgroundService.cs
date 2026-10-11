@@ -23,7 +23,7 @@ public sealed partial class ScreenshotBackgroundService(
                 job = await queue.DequeueAsync(stoppingToken);
                 queue.SetProcessing(true);
 
-                LogProcesssing(job.MediaPath, job.PositionSeconds, job.IncludeSubtitles, job.SubtitlesCodec,
+                LogProcesssing(job.MediaPath, job.PositionSeconds, job.CaptureRequest.IncludeSubtitles, job.SubtitlesCodec,
                     job.SubtitleIndex, job.ExternalSubtitlePath, job.OutputPath);
 
                 await ProcessAsync(job, stoppingToken);
@@ -59,7 +59,7 @@ public sealed partial class ScreenshotBackgroundService(
             job.PositionSeconds,
             job.MediaPath,
             job.OutputPath,
-            job.IncludeSubtitles,
+            job.CaptureRequest,
             job.SubtitleIndex,
             job.SubtitlesCodec,
             job.ExternalSubtitlePath);
