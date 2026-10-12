@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shotter.Core.Enums;
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
 
@@ -9,6 +10,7 @@ public sealed partial class ScreenshotBackgroundService(
     ICaptureQueue queue,
     ILogger<ScreenshotBackgroundService> logger,
     IScreenshotProcessor screenshotProcessor,
+    IClipProcessor clipProcessor,
     INotificationService notificationService)
     : BackgroundService
 {
@@ -51,15 +53,32 @@ public sealed partial class ScreenshotBackgroundService(
         CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(job.OutPutDirectory);
-        await screenshotProcessor.TakeScreenshot(
-            cancellationToken,
-            job.PositionSeconds,
-            job.MediaPath,
-            job.OutputPath,
-            job.CaptureRequest,
-            job.SubtitleIndex,
-            job.SubtitlesCodec,
-            job.ExternalSubtitlePath);
+        switch (job.CaptureType)
+        {
+            case CaptureType.Screenshot:
+                await screenshotProcessor.TakeScreenshot(
+                    cancellationToken,
+                    job.PositionSeconds,
+                    job.MediaPath,
+                    job.OutputPath,
+                    job.CaptureRequest,
+                    job.SubtitleIndex,
+                    job.SubtitlesCodec,
+                    job.ExternalSubtitlePath);
+                break;
+            case CaptureType.Gif:
+                await clipProcessor.TakeGif(
+                    cancellationToken,
+                    job.PositionSeconds,
+                    job.EndPositionSeconds!.Value,
+                    job.MediaPath,
+                    job.OutputPath);
+                break;
+            case CaptureType.Clip:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     private async Task SendErrorNotification(CaptureJob? job, CancellationToken cancellationToken)

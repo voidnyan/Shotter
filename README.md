@@ -30,6 +30,9 @@ services:
       Ffmpeg__PngQuality: # Optional, default 6
       Ffmpeg__WebpQuality: # Optional, default 90
       Ffmpeg__ScreenshotHeight: # Optional, removing this defaults to source resolution
+      Ffmpeg__GifFps: # Optional, defaults to 12
+      Ffmpeg__GifHeight: # Optional, defaults to 320
+      Ffmpeg__GifMaxLength: # Optional, the max length of Gif in seconds. Defaults to 2
       ApiKey: # Optional. If given, expects requests to provide Authorization header
     volumes:
       - ./screenshots:/screenshots
@@ -52,6 +55,9 @@ You can include the following query parameters in the above call. All of the par
 | includeSubtitles  | bool   | Include or exclude subtitles                             |
 | format            | string | The file format (png, jpg or webp)                       |
 | height            | int    | Height of the screenshot. Value of 0 uses source height. |
+
+Calling `http://<yourshotteraddress>/api/clip` twice can be used to queue taking a GIF.
+The first call marks the starting position of the GIF, and the second call marks the ending position.
 
 You can also call `/api/is-processing`, which will return `true`, if the server is currently processing a screenshot job
 and `false` if not.

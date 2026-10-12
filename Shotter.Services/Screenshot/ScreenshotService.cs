@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Shotter.Core.Enums;
 using Shotter.Core.Exceptions;
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
@@ -19,9 +20,10 @@ public partial class ScreenshotService(
         var output = fileNameResolver.ResolveOutputPath(mediaInfo);
         
         var job = new CaptureJob(
+            CaptureType.Screenshot,
             mediaInfo.MediaPath,
             mediaInfo.PositionSeconds,
-                request,
+            request,
             mediaInfo.SubtitlesIndex,
             mediaInfo.SubtitlesCodec,
             mediaInfo.ExternalSubtitlePath,
