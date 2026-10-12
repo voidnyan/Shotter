@@ -1,6 +1,9 @@
+using Shotter.Core.Enums;
+
 namespace Shotter.Core.Models;
 
 public sealed record CaptureJob(
+    CaptureType CaptureType,
     string MediaPath,
     double PositionSeconds,
     CaptureRequest CaptureRequest,
@@ -8,4 +11,5 @@ public sealed record CaptureJob(
     string? SubtitlesCodec,
     string? ExternalSubtitlePath,
     string OutputPath,
-    string OutPutDirectory);
+    string OutPutDirectory,
+    double? EndPositionSeconds = null);

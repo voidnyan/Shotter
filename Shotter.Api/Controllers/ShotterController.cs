@@ -10,7 +10,8 @@ namespace Shotter.Api.Controllers;
 public class ShotterController(
     ICaptureQueue captureQueue,
     INotificationService notificationService,
-    IScreenshotService screenshotService)
+    IScreenshotService screenshotService,
+    IClipService clipService)
     : ControllerBase
 {
     [HttpGet("screenshot")]
@@ -18,6 +19,13 @@ public class ShotterController(
         CancellationToken cancellationToken)
     {
         await screenshotService.HandleScreenshotRequest(request, cancellationToken);
+        return Accepted();
+    }
+
+    [HttpGet("clip")]
+    public async Task<IActionResult> ClipCurrentStream(CancellationToken cancellationToken)
+    {
+        await clipService.ProcessClipRequestAsync(cancellationToken);
         return Accepted();
     }
 
