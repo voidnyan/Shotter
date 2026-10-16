@@ -219,9 +219,11 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
 
     private async Task<int?> GetResolutionHeight(CaptureRequest request, string mediaPath)
     {
+        if (request.Height < 1) return null;
+        
         var height = request.Height ?? _options.ScreenshotHeight;
 
-        if (!height.HasValue) return null;
+        if (height is null or < 1) return null;
 
         var sourceHeight = await GetVideoHeightAsync(mediaPath);
         height = Math.Min(sourceHeight, height.Value);

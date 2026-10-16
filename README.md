@@ -47,11 +47,11 @@ It is recommended to pause the stream before the call.
 
 You can include the following query parameters in the above call. All of the parameters are optional.
 
-| Parameter         | Type   | Description                           |
-| ----------------- | ----   | ------------------------------------- |
-| includeSubtitles  | bool   | Include or exclude subtitles          |
-| format            | string | The file format (png, jpg or webp)    |
-| height            | int    | Height of the screenshot.             |
+| Parameter         | Type   | Description                                              |
+| ----------------- | ----   | -------------------------------------------------------- |
+| includeSubtitles  | bool   | Include or exclude subtitles                             |
+| format            | string | The file format (png, jpg or webp)                       |
+| height            | int    | Height of the screenshot. Value of 0 uses source height. |
 
 You can also call `/api/is-processing`, which will return `true`, if the server is currently processing a screenshot job
 and `false` if not.
