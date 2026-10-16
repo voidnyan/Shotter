@@ -25,6 +25,7 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<ApiKeyMiddleware>();
 app.MapControllers();
 
 app.Run();

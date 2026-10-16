@@ -29,6 +29,7 @@ services:
       Ffmpeg__PngQuality: # Optional, default 6
       Ffmpeg__WebpQuality: # Optional, default 90
       Ffmpeg__ScreenshotHeight: # Optional, removing this defaults to source resolution
+      ApiKey: # Optional. If given, expects requests to provide Authorization header
     volumes:
       - ./screenshots:/screenshots
       - /path/to/media:/media:ro
@@ -60,3 +61,7 @@ You can configure Shotter to send you a notification if it fails to process a sc
 Currently only Ntfy is supported as a notification provider.
 
 You can call `/api/test-notification` to send a test notification to verify that they work.
+
+## Authorization header
+If ApiKey is set in the docker environment variables, the API calls expect the key to be passed in every call. 
+Pass the ApiKey in `Authorization` header with the following format: `Bearer <your api key>`.
