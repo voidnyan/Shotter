@@ -20,10 +20,11 @@ services:
       MediaServerApiKey: # Your media server API key
       MediaServerUserName: # Optional. Used to specify the user whose activity will be screenshotted
       MediaServerType: # Jellyfin or Plex, removing this defaults to Jellyfin
-      NotificationProvider: # Optional, supported providers: Ntfy
+      NotificationProvider: # Optional, supported providers: Ntfy, Discord
       Ntfy__Url: # Ntfy service url
       Ntfy__Topic: # The ntfy topic the notification will be sent
-      Ntfy__AccessToken: # Optional, needed if the topic is protected
+      Ntfy__AccessToken: # Optional, required if the topic is protected
+      Discord_Url: # Optional. Discord webhook url, required if using Discord as notification provider
       Ffmpeg__ScreenshotFileExtension: # Optional, defaults to jpg
       Ffmpeg__JpgQuality: # Optional, default 2
       Ffmpeg__PngQuality: # Optional, default 6
@@ -58,7 +59,7 @@ and `false` if not.
 ## Notifications
 
 You can configure Shotter to send you a notification if it fails to process a screenshot job.
-Currently only Ntfy is supported as a notification provider.
+Supported providers are Ntfy and Discord.
 
 You can call `/api/test-notification` to send a test notification to verify that they work.
 

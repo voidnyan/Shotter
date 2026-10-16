@@ -15,6 +15,7 @@ public static class WebApplicationBuilderExtensions
             builder.Services.Configure<ShotterOptions>(builder.Configuration);
             builder.Services.AddOptions<NtfyOptions>().BindConfiguration("Ntfy");
             builder.Services.AddOptions<FfmpegOptions>().BindConfiguration("Ffmpeg");
+            builder.Services.AddOptions<DiscordOptions>().BindConfiguration("Discord");
             return builder;
         }
         
@@ -34,13 +35,20 @@ public static class WebApplicationBuilderExtensions
 
         public WebApplicationBuilder RegisterNotificationProvider()
         {
-            if (builder.Configuration.GetValue<NotificationProviderType?>(nameof(ShotterOptions.NotificationProvider)) == NotificationProviderType.Ntfy)
+            var notificationProviderType =
+                builder.Configuration.GetValue<NotificationProviderType?>(nameof(ShotterOptions.NotificationProvider));
+            
+            switch (notificationProviderType)
             {
-                builder.Services.AddTransient<INotificationService, NtfyService>();
-            }
-            else
-            {
-                builder.Services.AddTransient<INotificationService, NoopNotificationService>();
+                case NotificationProviderType.Ntfy:
+                    builder.Services.AddTransient<INotificationService, NtfyService>();
+                    break;
+                case NotificationProviderType.Discord:
+                    builder.Services.AddTransient<INotificationService, DiscordService>();
+                    break;
+                default:
+                    builder.Services.AddTransient<INotificationService, NoopNotificationService>();
+                    break;
             }
 
             return builder;
