@@ -178,8 +178,8 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
         startInfo.ArgumentList.Add(mediaPath);
         
         var filter = string.IsNullOrEmpty(externalSubtitlePath)
-            ? $"subtitles=filename='{mediaPath}':si={subtitlesIndex}"
-            : $"subtitles=filename='{externalSubtitlePath}'";
+            ? $"subtitles=filename='{EscapeFfmpegFilterValue(mediaPath)}':si={subtitlesIndex}"
+            : $"subtitles=filename='{EscapeFfmpegFilterValue(externalSubtitlePath)}'";
         
         var resolutionFilter = await GetResolutionFilter(request, mediaPath);
         if (!string.IsNullOrEmpty(resolutionFilter))
@@ -300,5 +300,9 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
                 startInfo.ArgumentList.Add(_options.PngQuality);
                 break;
         }
+    }
+    private static string EscapeFfmpegFilterValue(string value)
+    {
+        return value.Replace(@"'", @"'\\\''");
     }
 }
