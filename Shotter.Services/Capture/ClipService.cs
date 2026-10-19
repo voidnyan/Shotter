@@ -3,7 +3,7 @@ using Shotter.Core.Exceptions;
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
 
-namespace Shotter.Services.Clip;
+namespace Shotter.Services.Capture;
 
 public class ClipService(
     IPlaybackProvider playbackProvider, 
@@ -11,7 +11,7 @@ public class ClipService(
     ICaptureQueue captureQueue,
     IFileNameResolver fileNameResolver) : IClipService
 {
-    public async Task ProcessClipRequestAsync(CancellationToken cancellationToken)
+    public async Task ProcessClipRequestAsync(CaptureRequest request, CancellationToken cancellationToken)
     {
         var pendingCapture = pendingClipCaptureStore.Get();
         var currentPlayback = await playbackProvider.GetPlaybackInformation(cancellationToken);
@@ -33,7 +33,7 @@ public class ClipService(
             CaptureType.Gif,
             currentPlayback.MediaPath,
             originalPlayback.PositionSeconds,
-            new CaptureRequest(),
+            request,
             currentPlayback.SubtitlesIndex,
             currentPlayback.SubtitlesCodec,
             currentPlayback.ExternalSubtitlePath,

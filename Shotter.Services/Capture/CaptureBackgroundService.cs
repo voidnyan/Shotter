@@ -4,11 +4,11 @@ using Shotter.Core.Enums;
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
 
-namespace Shotter.Services.Screenshot;
+namespace Shotter.Services.Capture;
 
-public sealed partial class ScreenshotBackgroundService(
+public sealed partial class CaptureBackgroundService(
     ICaptureQueue queue,
-    ILogger<ScreenshotBackgroundService> logger,
+    ILogger<CaptureBackgroundService> logger,
     IScreenshotProcessor screenshotProcessor,
     IClipProcessor clipProcessor,
     INotificationService notificationService)
@@ -72,7 +72,8 @@ public sealed partial class ScreenshotBackgroundService(
                     job.PositionSeconds,
                     job.EndPositionSeconds!.Value,
                     job.MediaPath,
-                    job.OutputPath);
+                    job.OutputPath,
+                    job.CaptureRequest as ClipCaptureRequest ?? throw new InvalidOperationException());
                 break;
             case CaptureType.Clip:
                 break;

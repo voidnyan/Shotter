@@ -1,7 +1,7 @@
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
 
-namespace Shotter.Services.Clip;
+namespace Shotter.Services.Capture;
 
 public sealed class PendingClipCaptureStore : IPendingClipCaptureStore
 {

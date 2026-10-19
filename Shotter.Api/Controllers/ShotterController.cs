@@ -23,9 +23,10 @@ public class ShotterController(
     }
 
     [HttpGet("clip")]
-    public async Task<IActionResult> ClipCurrentStream(CancellationToken cancellationToken)
+    public async Task<IActionResult> ClipCurrentStream([FromQuery] ClipCaptureRequest request,
+        CancellationToken cancellationToken)
     {
-        await clipService.ProcessClipRequestAsync(cancellationToken);
+        await clipService.ProcessClipRequestAsync(request, cancellationToken);
         return Accepted();
     }
 

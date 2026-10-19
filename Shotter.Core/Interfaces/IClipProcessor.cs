@@ -9,5 +9,6 @@ public interface IClipProcessor
         double positionSeconds, 
         double endPositionSeconds,
         string mediaPath,
-        string outputPath);
+        string outputPath,
+        ClipCaptureRequest request);
 }

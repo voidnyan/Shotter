@@ -32,7 +32,7 @@ services:
       Ffmpeg__ScreenshotHeight: # Optional, removing this defaults to source resolution
       Ffmpeg__GifFps: # Optional, defaults to 12
       Ffmpeg__GifHeight: # Optional, defaults to 320
-      Ffmpeg__GifMaxLength: # Optional, the max length of Gif in seconds. Defaults to 2
+      Ffmpeg__GifMaxLength: # Optional, the max length of Gif in seconds. Defaults to 5
       ApiKey: # Optional. If given, expects requests to provide Authorization header
     volumes:
       - ./screenshots:/screenshots

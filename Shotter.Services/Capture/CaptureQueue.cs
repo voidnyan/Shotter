@@ -4,7 +4,7 @@ using Shotter.Core.Configuration;
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
 
-namespace Shotter.Services.Screenshot;
+namespace Shotter.Services.Capture;
 
 public sealed class CaptureQueue : ICaptureQueue
 {

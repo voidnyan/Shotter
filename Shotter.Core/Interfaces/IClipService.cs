@@ -4,5 +4,5 @@ namespace Shotter.Core.Interfaces;
 
 public interface IClipService
 {
-    Task ProcessClipRequestAsync(CancellationToken cancellationToken);
+    Task ProcessClipRequestAsync(CaptureRequest request, CancellationToken cancellationToken);
 }
