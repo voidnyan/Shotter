@@ -2,8 +2,7 @@ using Shotter.Api.Configuration;
 using Shotter.Api.Middleware;
 using Shotter.Core.Interfaces;
 using Shotter.Services;
-using Shotter.Services.Clip;
-using Shotter.Services.Screenshot;
+using Shotter.Services.Capture;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +11,7 @@ builder
     .RegisterPlaybackProvider()
     .RegisterNotificationProvider();
 
-builder.Services.AddHostedService<ScreenshotBackgroundService>();
+builder.Services.AddHostedService<CaptureBackgroundService>();
 builder.Services
     .AddSingleton<ICaptureQueue, CaptureQueue>()
     .AddSingleton<IPendingClipCaptureStore, PendingClipCaptureStore>();

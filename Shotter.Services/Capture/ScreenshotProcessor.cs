@@ -5,9 +5,9 @@ using Shotter.Core.Configuration;
 using Shotter.Core.Interfaces;
 using Shotter.Core.Models;
 
-namespace Shotter.Services.Screenshot;
+namespace Shotter.Services.Capture;
 
-public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotProcessor
+public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : BaseProcessor, IScreenshotProcessor
 {
     private const int PreSeekInSeconds = 5;
     private readonly FfmpegOptions _options = options.Value;
@@ -58,27 +58,8 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
 
         startInfo.ArgumentList.Add("-y");
         startInfo.ArgumentList.Add(outputPath + "." + GetFileExtension(request));
-
-        using var process = new Process();
-        process.StartInfo = startInfo;
-
-        process.Start();
-
-        var stderrTask = process.StandardError.ReadToEndAsync(
-            cancellationToken);
-
-        var stdoutTask = process.StandardOutput.ReadToEndAsync(
-            cancellationToken);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        var stderr = await stderrTask;
-        _ = await stdoutTask;
         
-        if (process.ExitCode != 0)
-        {
-            throw new Exception(stderr);
-        }
+        await RunProcess(startInfo, cancellationToken);
     }
 
     private async Task WithSubs(
@@ -213,68 +194,10 @@ public class ScreenshotProcessor(IOptions<FfmpegOptions> options) : IScreenshotP
 
     private async Task<string> GetResolutionFilter(CaptureRequest request, string mediaPath)
     {
-        var height = await GetResolutionHeight(request, mediaPath);
+        var height = await GetResolutionHeight(request, mediaPath, _options.ScreenshotHeight);
         return height.HasValue ? $"scale=-2:{height}:flags=lanczos" : string.Empty;
     }
-
-    private async Task<int?> GetResolutionHeight(CaptureRequest request, string mediaPath)
-    {
-        if (request.Height < 1) return null;
-        
-        var height = request.Height ?? _options.ScreenshotHeight;
-
-        if (height is null or < 1) return null;
-
-        var sourceHeight = await GetVideoHeightAsync(mediaPath);
-        height = Math.Min(sourceHeight, height.Value);
-
-        return height == sourceHeight ? null : height;
-    }
     
-    private static async Task<int> GetVideoHeightAsync(
-        string mediaPath,
-        CancellationToken cancellationToken = default)
-    {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = "ffprobe",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        startInfo.ArgumentList.Add("-v");
-        startInfo.ArgumentList.Add("error");
-        startInfo.ArgumentList.Add("-select_streams");
-        startInfo.ArgumentList.Add("v:0");
-        startInfo.ArgumentList.Add("-show_entries");
-        startInfo.ArgumentList.Add("stream=height");
-        startInfo.ArgumentList.Add("-of");
-        startInfo.ArgumentList.Add("default=noprint_wrappers=1:nokey=1");
-        startInfo.ArgumentList.Add(mediaPath);
-
-        using var process = Process.Start(startInfo)
-                            ?? throw new InvalidOperationException("Failed to start ffprobe.");
-
-        var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        var output = await outputTask;
-        var error = await errorTask;
-
-        if (process.ExitCode != 0 ||
-            !int.TryParse(output.Trim(), out var height))
-        {
-            throw new InvalidOperationException(
-                $"Could not determine video height. {error}");
-        }
-
-        return height;
-    }
-
     private string GetFileExtension(CaptureRequest request)
     {
         return request.Format ?? _options.ScreenshotFileExtension;
